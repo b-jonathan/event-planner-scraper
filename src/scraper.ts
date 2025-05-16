@@ -5,7 +5,6 @@ import { createObjectCsvWriter } from "csv-writer";
 
 interface Planner {
   name: string;
-  profileUrl: string;
   website: string | null;
   instagram: string | null;
   email: string | null;
@@ -15,11 +14,11 @@ interface Planner {
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
-  const limit = pLimit(5); // safer concurrency
+  const limit = pLimit(10); // safer concurrency
   const allLinks: { name: string; profileUrl: string }[] = [];
-  let currentPage = 41;
-  let maxPage = 61;
-  while (currentPage < maxPage) {
+  let currentPage = 1;
+  // let maxPage = 61;
+  while (true) {
     const url = `https://www.partyslate.com/find-vendors/event-planner?page=${currentPage}`;
     console.log(`Scraping list page ${currentPage}...`);
 
@@ -132,7 +131,7 @@ interface Planner {
     )
   );
 
-  const emailLimit = pLimit(5); // limit concurrent website checks
+  const emailLimit = pLimit(10); // limit concurrent website checks
   const brokenLinks = ["https://www.viaggiodeifiori.co.za/"];
   await Promise.all(
     planners.map((planner) =>
@@ -259,7 +258,6 @@ interface Planner {
     path: "planners_full.csv",
     header: [
       { id: "name", title: "Name" },
-      { id: "profileUrl", title: "Profile URL" },
       { id: "website", title: "Website" },
       { id: "instagram", title: "Instagram" },
       { id: "email", title: "Email" },
